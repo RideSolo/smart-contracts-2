@@ -1,6 +1,6 @@
+import { sig } from "../utils";
+import expectThrow from "zeppelin-solidity/test/helpers/expectThrow";
 const RBACMixin = artifacts.require("RBACMixin.sol");
-const { sig } = require("../utils");
-const { expectThrow } = require("zeppelin-solidity/test/helpers/expectThrow");
 
 contract("RBAC Mixin", ([owner, stranger, another]) => {
   describe("RBAC", () => {
