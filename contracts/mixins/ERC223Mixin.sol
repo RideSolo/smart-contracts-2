@@ -13,7 +13,11 @@ contract ERC223Mixin is StandardToken {
   ) public returns (bool) 
   {
     bytes memory empty;
-    return transferFrom(_from, _to, _value, empty);
+    return transferFrom(
+      _from, 
+      _to, 
+      _value, 
+      empty);
   }
 
   function transferFrom(
@@ -26,17 +30,33 @@ contract ERC223Mixin is StandardToken {
     require(_value <= allowed[_from][msg.sender]);
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     if (isContract(_to)) {
-      return transferToContract(_from, _to, _value, _data);
+      return transferToContract(
+        _from, 
+        _to, 
+        _value, 
+        _data);
     } else {
-      return transferToAddress(_from, _to, _value, _data);
+      return transferToAddress(
+        _from, 
+        _to, 
+        _value, 
+        _data);
     }
   }
 
   function transfer(address _to, uint _value, bytes _data) public returns (bool success) {
     if (isContract(_to)) {
-      return transferToContract(msg.sender, _to, _value, _data);
+      return transferToContract(
+        msg.sender,
+        _to,
+        _value,
+        _data);
     } else {
-      return transferToAddress(msg.sender, _to, _value, _data);
+      return transferToAddress(
+        msg.sender,
+        _to,
+        _value,
+        _data);
     }
   }
 
@@ -74,7 +94,7 @@ contract ERC223Mixin is StandardToken {
   {
     require(moveTokens(_from, _to, _value));
     emit Transfer(_from, _to, _value);
-    emit Transfer(_from, _to, _value, _data);
+    emit Transfer(_from, _to, _value, _data); // solium-disable-line arg-overflow
     return true;
   }
   
@@ -89,7 +109,7 @@ contract ERC223Mixin is StandardToken {
     require(moveTokens(_from, _to, _value));
     ERC223ReceiverMixin(_to).tokenFallback(_from, _value, _data);
     emit Transfer(_from, _to, _value);
-    emit Transfer(_from, _to, _value, _data);
+    emit Transfer(_from, _to, _value, _data); // solium-disable-line arg-overflow
     return true;
   }
 }

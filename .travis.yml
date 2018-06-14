@@ -17,6 +17,5 @@ matrix:
 before_script:
   - truffle version
 script:
-  - npm run lint
   - npm run lint:sol
   - npm run test
