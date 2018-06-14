@@ -22,7 +22,9 @@
     "url": "git+https://github.com/MUSTplatform/smart-contracts.git"
   },
   "author": "",
-  "contributors": ["Aler Denisov <aler.zampillo@gmail.com>"],
+  "contributors": [
+    "Aler Denisov <aler.zampillo@gmail.com>"
+  ],
   "bugs": {
     "url": "https://github.com/MUSTplatform/smart-contracts/issues"
   },
