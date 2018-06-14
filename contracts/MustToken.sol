@@ -6,12 +6,7 @@ import "./mixins/CappedMintableTokenMixin.sol";
 import "zeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
 
 
-contract MustToken is 
-  StandardBurnableToken, 
-  CappedMintableTokenMixin, 
-  RBACERC223TokenFinalization, 
-  RBACMintableTokenMixin 
-{
+contract MustToken is StandardBurnableToken, CappedMintableTokenMixin, RBACERC223TokenFinalization, RBACMintableTokenMixin {
   // solium-disable-next-line uppercase
   string constant public name = "Main Universal Standard of Tokenization"; 
   string constant public symbol = "MUST"; // solium-disable-line uppercase

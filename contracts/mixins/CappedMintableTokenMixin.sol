@@ -3,9 +3,7 @@ import "zeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
 
 
 contract CappedMintableTokenMixin is MintableToken {
-  function hardcap() public pure returns(uint) {
-    return 0;
-  }
+  function hardcap() public pure returns(uint);
 
   function mint(
     address _to,

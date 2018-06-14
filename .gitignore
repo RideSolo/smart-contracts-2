@@ -2,3 +2,5 @@ node_modules
 .vscode
 *-error.log
 build
+coverage
+coverage.json
