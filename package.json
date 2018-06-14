@@ -30,7 +30,8 @@
   },
   "homepage": "https://github.com/MUSTplatform/smart-contracts#readme",
   "dependencies": {
-    "truffle": "4.1.11"
+    "truffle": "4.1.11",
+    "zeppelin-solidity": "^1.10.0"
   },
   "devDependencies": {
     "coveralls": "3.0.1",
