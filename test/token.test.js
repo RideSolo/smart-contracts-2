@@ -2,7 +2,7 @@ import { sig } from "./utils";
 import expectThrow from "zeppelin-solidity/test/helpers/expectThrow";
 const MustToken = artifacts.require("MustToken.sol");
 
-contract("Token contract", ([owner, minter, buyer]) => {
+contract("Token contract", ([owner, minter, buyer, another]) => {
   let token;
   let STRANGER_ROLE;
   let ALL_ROLES;
@@ -77,6 +77,72 @@ contract("Token contract", ([owner, minter, buyer]) => {
 
       assert.equal(0, afterBalance, "Balance didn't burn after burn action");
       assert.equal(0, afterTotal, "Total supply didn't burn after burn action");
+    });
+  });
+  describe("Finalization", () => {
+    before(async () => {
+      await token.mint(buyer, 100000000, sig(minter));
+    });
+
+    it("should reject transfer before sane", async () => {
+      await expectThrow(token.transfer(another, 50000, sig(buyer)));
+    });
+
+    it("shold reject sanetization from non admin", async () => {
+      const NOT_ADMIN = ~ADMIN_ROLE & 0xff;
+      await token.updateRole(buyer, NOT_ADMIN, sig(owner));
+      await expectThrow(token.transfer(another, 50000, sig(buyer)));
+      await expectThrow(token.approve(another, 50000, sig(buyer)));
+      await expectThrow(
+        token.transfer(another, 50000, Buffer.from("hello world"), sig(buyer))
+      );
+      await expectThrow(
+        token.transferFrom(buyer, another, 25000, sig(another))
+      );
+      await expectThrow(
+        token.transferFrom(
+          buyer,
+          another,
+          25000,
+          Buffer.from("hello world"),
+          sig(another)
+        )
+      );
+    });
+
+    it("should allow owner sane token", async () => {
+      await token.saneIt(sig(owner));
+      assert.isTrue(await token.sane(), "Token isn't sane after sane action");
+    });
+
+    it("should finish minting in sane", async () => {
+      assert.isTrue(
+        await token.mintingFinished(),
+        "Minting isn't finish after sane action"
+      );
+    });
+
+    it("should allow to transfer tokens after sane", async () => {
+      await token.transfer(another, 5000, sig(buyer));
+      await token.approve(another, 50000, sig(buyer));
+      await token.transfer(
+        another,
+        50000,
+        Buffer.from("hello world"),
+        sig(buyer)
+      );
+      await token.transferFrom(buyer, another, 25000, sig(another));
+      await token.transferFrom(
+        buyer,
+        another,
+        25000,
+        Buffer.from("hello world"),
+        sig(another)
+      );
+    });
+
+    it("prevent minting after sane", async () => {
+      await expectThrow(token.mint(buyer, 10000, sig(minter)));
     });
   });
 });
