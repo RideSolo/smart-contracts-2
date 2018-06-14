@@ -1,4 +1,4 @@
-import { sig } from "../utils";
+import { sig } from "./utils";
 import expectThrow from "zeppelin-solidity/test/helpers/expectThrow";
 const RBACMixin = artifacts.require("RBACMixin.sol");
 
