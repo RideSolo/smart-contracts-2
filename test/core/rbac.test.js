@@ -38,12 +38,40 @@ contract("RBAC Mixin", ([owner, stranger, another]) => {
       await rbac.updateRole(stranger, MINTER_ROLE, sig(owner));
     });
 
+    it("stranger should haven't access to update roles", async () => {
+      await expectThrow(rbac.updateRole(another, MINTER_ROLE, sig(another)));
+    });
+
     it("minter should haven't access to update roles", async () => {
       await expectThrow(rbac.updateRole(another, MINTER_ROLE, sig(stranger)));
     });
 
     it("should allow to grand multiple roles", async () => {
+      assert.equal(
+        STRANGER_ROLE,
+        await rbac.roles(another),
+        "Another account have different roles when STRANGER"
+      );
       await rbac.updateRole(another, ADMIN_ROLE | MINTER_ROLE, sig(owner));
+
+      assert.isTrue(
+        await rbac.hasRoles(another, ADMIN_ROLE),
+        "Another account haven't admin role after update"
+      );
+      assert.isTrue(
+        await rbac.hasRoles(another, MINTER_ROLE),
+        "Another account haven't minter role after update"
+      );
+    });
+
+    it("new admin should have rights to remove previous", async () => {
+      await rbac.updateRole(owner, STRANGER_ROLE, sig(another));
+
+      assert.equal(
+        STRANGER_ROLE,
+        await rbac.roles(owner),
+        "Owner still has some roles"
+      );
     });
   });
 });
