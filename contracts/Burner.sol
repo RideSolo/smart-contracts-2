@@ -20,8 +20,7 @@ contract Burner is ERC223ReceiverMixin {
   uint64 public constant date31Dec2021 = 1640908800;
   uint64 public constant date31Dec2022 = 1672444800;
 
-  uint64[] public dates = [date01June2018 
-                           ,date31Dec2018 
+  uint64[] public dates = [date31Dec2018 
                            ,date31Dec2019
                            ,date31Dec2020
                            ,date31Dec2021
@@ -35,6 +34,7 @@ contract Burner is ERC223ReceiverMixin {
     uint8 i = 0;
     while (i < dates.length && dates[i] > now)
       i++;
+    require(i < dates.length);
     uint8 discount = discounts[i];
     ERC223TokenBurner token = ERC223TokenBurner(msg.sender);
     require(token.burn(_value));
