@@ -1,3 +1,5 @@
+import increaseTime from "../node_modules/zeppelin-solidity/test/helpers/increaseTime.js";
+
 export function sig(address, opts) {
   if (typeof opts === "undefined") {
     opts = {};
@@ -11,3 +13,10 @@ export function sig(address, opts) {
     ...opts
   };
 }
+
+export function timeTravelTo(date) {
+  const duration = new Date(date).getTime() / 1000 - web3.eth.getBlock(web3.eth.blockNumber).timestamp + 1;
+
+  increaseTime(duration);
+}
+
