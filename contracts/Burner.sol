@@ -1,8 +1,5 @@
 pragma solidity ^0.4.24;
-
-import "./ERC223Mixin.sol";
-import "./ERC223Mixin.sol";
-import "./ERC223ReceiverMixin.sol";
+import "./mixins/ERC223ReceiverMixin.sol";
 
 
 interface ERC223TokenBurner {
