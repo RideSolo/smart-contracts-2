@@ -2,6 +2,7 @@ pragma solidity ^0.4.24;
 
 import "../mixins/ERC223ReceiverMixin.sol";
 
+
 contract ERC223TokenBurnerMock {
 
   event BurnMock(uint256 amount);
@@ -12,7 +13,7 @@ contract ERC223TokenBurnerMock {
   }
 
   function triggerFallback(address _from, uint _value, bytes _data) public {
-    BurnMock(_value);
+    emit BurnMock(_value);
     receiver.tokenFallback(_from, _value, _data); 
   }
 
