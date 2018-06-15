@@ -35,7 +35,7 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
   });
   describe("Minting", () => {
     before(async () => {
-      await token.updateRole(minter, MINTER_ROLE, sig(owner));
+      await token.addMinter(minter, sig(owner));
     });
     it("should have 0 token after start", async () => {
       assert.equal(
@@ -84,27 +84,40 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
     it("should reject transfer before sane", async () => {
       await expectThrow(token.transfer(another, 50000, sig(buyer)));
     });
-    it("shold reject sanetization from non admin", async () => {
-      const NOT_ADMIN = ~ADMIN_ROLE & 0xff;
-      await token.updateRole(buyer, NOT_ADMIN, sig(owner));
-      await expectThrow(token.transfer(another, 50000, sig(buyer)));
-      await expectThrow(token.approve(another, 50000, sig(buyer)));
-      await expectThrow(
-        token.transfer(another, 50000, Buffer.from("hello world"), sig(buyer))
-      );
-      await expectThrow(token.increaseApproval(another, 1000, sig(buyer)));
-      await expectThrow(token.decreaseApproval(another, 1000, sig(buyer)));
-      await expectThrow(
-        token.transferFrom(buyer, another, 25000, sig(another))
-      );
-      await expectThrow(
-        token.transferFrom(
-          buyer,
-          another,
-          25000,
-          Buffer.from("hello world"),
-          sig(another)
-        )
+    it("should reject sanetization from stranger and minter", async () => {
+      await Promise.all(
+        [buyer, minter].map(async account => {
+          assert.isFalse(await token.isOwner(account));
+          await expectThrow(token.saneIt(sig(account)));
+          await expectThrow(token.transfer(another, 50000, sig(account)));
+          await expectThrow(token.approve(another, 50000, sig(account)));
+          await expectThrow(
+            token.transfer(
+              another,
+              50000,
+              Buffer.from("hello world"),
+              sig(account)
+            )
+          );
+          await expectThrow(
+            token.increaseApproval(another, 1000, sig(account))
+          );
+          await expectThrow(
+            token.decreaseApproval(another, 1000, sig(account))
+          );
+          await expectThrow(
+            token.transferFrom(account, another, 25000, sig(another))
+          );
+          await expectThrow(
+            token.transferFrom(
+              account,
+              another,
+              25000,
+              Buffer.from("hello world"),
+              sig(another)
+            )
+          );
+        })
       );
     });
     it("should allow owner sane token", async () => {
