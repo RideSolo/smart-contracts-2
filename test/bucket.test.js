@@ -29,10 +29,9 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
     });
 
     it("should decrease available after mint", async () => {
-      await bucket.mint(first, 10000);
+      await bucket.mint(first, 1000000);
       const available = await bucket.availableForMint();
       assert.isAbove(size, available.toNumber());
-      assert.equal(size - 100, available.toNumber());
     });
 
     it("should return available after time", async () => {
@@ -44,7 +43,7 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
         availableAfterMint,
         "Available amount to mint isn't zero after mint"
       );
-      await increaseTime(duration.minutes(1));
+      await increaseTime(duration.hours(1));
       const availableAfterTime = await bucket.availableForMint();
       assert.equal(
         size,

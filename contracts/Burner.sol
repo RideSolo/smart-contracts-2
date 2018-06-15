@@ -4,7 +4,7 @@ import "./mixins/ERC223ReceiverMixin.sol";
 
 
 interface ERC223TokenBurner {
-  function burn(uint256 _amount) returns (bool);
+  function burn(uint256 _amount) external returns (bool);
 }
 
 
@@ -36,6 +36,7 @@ contract Burner is ERC223ReceiverMixin {
   ];
 
   function tokenFallback(address _from, uint _value, bytes _data) public {
+    _data; // unused param
     // solium-disable-next-line security/no-block-members
     require(now >= DATE_01_JUNE_2018); 
     uint8 i = 0;
