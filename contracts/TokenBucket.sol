@@ -6,6 +6,7 @@ interface IMintableToken {
   function mint(address _to, uint256 _amount) external returns (bool);
 }
 
+
 contract TokenBucket is RBACMixin {
   using SafeMath for uint;
   uint public size;
