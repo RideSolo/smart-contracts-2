@@ -1,11 +1,11 @@
 pragma solidity ^0.4.24;
 
-import "./mixins/ERC223Mixin.sol";
-import "./mixins/ERC223Mixin.sol";
-import "./mixins/ERC223ReceiverMixin.sol";
+import "./ERC223Mixin.sol";
+import "./ERC223Mixin.sol";
+import "./ERC223ReceiverMixin.sol";
 
 
-contract ERC223TokenBurner {
+interface ERC223TokenBurner {
   function burn(uint256 _amount) public returns (bool);
 }
 
@@ -32,12 +32,10 @@ contract Burner is ERC223ReceiverMixin {
   function tokenFallback(address _from, uint _value, bytes _data) public {
     require(now >= date01June2018);
     uint8 i = 0;
-    while (i < dates.length && dates[i] > now)
-      i++;
+    while (i < dates.length && dates[i] < now) i++;
     require(i < dates.length);
     uint8 discount = discounts[i];
-    ERC223TokenBurner token = ERC223TokenBurner(msg.sender);
-    require(token.burn(_value));
+    require(ERC223TokenBurner(msg.sender).burn(_value));
     Burn(_from, _value, discount);
   }
 }
