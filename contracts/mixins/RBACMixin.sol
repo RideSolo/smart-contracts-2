@@ -28,18 +28,8 @@ contract RBACMixin {
     _;
   }
 
-  modifier shouldBeOwner(address _who) {
-    require(isOwner(_who), FORBIDDEN);
-    _;
-  }
-
   modifier senderIsMinter() {
     require(isMinter(msg.sender), FORBIDDEN);
-    _;
-  }
-  
-  modifier shouldBeMinter(address _who) {
-    require(isMinter(_who), FORBIDDEN);
     _;
   }
 
