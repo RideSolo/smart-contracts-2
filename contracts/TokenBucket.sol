@@ -23,19 +23,19 @@ contract TokenBucket is RBACMixin {
     rate = _rate;
   }
 
-  function setSize(uint _size) public returns (bool) {
+  function setSize(uint _size) public senderIsOwner returns (bool) {
     size = _size;
   }
 
-  function setRate(uint _rate) public returns (bool) {
+  function setRate(uint _rate) public senderIsOwner returns (bool) {
     rate = _rate;
   }
 
-  function setSizeAndRate(uint _size, uint _rate) public returns (bool) {
+  function setSizeAndRate(uint _size, uint _rate) public senderIsOwner returns (bool) {
     return setSize(_size) && setRate(_rate);
   }
 
-  function mint(address _beneficiar, uint _amount) public returns (bool) {
+  function mint(address _beneficiar, uint _amount) public senderIsMinter returns (bool) {
     uint available = availableForMint();
     require(_amount <= available);
     leftOnLastMint = available.sub(_amount);

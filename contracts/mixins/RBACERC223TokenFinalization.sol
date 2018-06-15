@@ -16,7 +16,7 @@ contract RBACERC223TokenFinalization is ERC223Mixin, RBACMixin {
     _;
   }
 
-  function saneIt() public notSane needRole(msg.sender, ADMIN_ROLE) returns (bool) {
+  function saneIt() public notSane senderIsOwner returns (bool) {
     sane = true;
     return true;
   }

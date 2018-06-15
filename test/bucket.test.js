@@ -3,17 +3,20 @@ import expectThrow from "zeppelin-solidity/test/helpers/expectThrow";
 import increaseTime, {
   duration
 } from "zeppelin-solidity/test/helpers/increaseTime";
+const SolidityCoder = require("web3/lib/solidity/coder.js");
 const TokenBucket = artifacts.require("TokenBucket.sol");
-const GenericToken = artifacts.require("GenericToken.sol");
+const MustToken = artifacts.require("MustToken.sol");
 
 contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
   let bucket, token, size, rate;
   before(async () => {
-    rate = 5000 * 10e8; // 5k tokens per second
-    size = 300000 * 10e8; // 300k tokens per second (1 minute to fullfil)
-    token = await GenericToken.new();
+    // 5k tokens per second
+    rate = 5000 * 10e8;
+    // 300k tokens per second (1 minute to fullfil)
+    size = 300000 * 10e8;
+    token = await MustToken.new();
     bucket = await TokenBucket.new(token.address, size, rate);
-    await token.transferOwnership(bucket.address);
+    await token.addMinter(bucket.address);
     await bucket.addMinter(minter);
   });
 
@@ -76,6 +79,111 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
       await bucket.setRate(rate + rate, sig(owner));
       await bucket.setSize(size + size, sig(owner));
       await bucket.setSizeAndRate(size + size, rate + rate, sig(owner));
+    });
+
+    it("reject minting from strangers", async () => {
+      await Promise.all(
+        [first, second].map(async account => {
+          const available = await bucket.availableForMint();
+          assert.isBelow(0, available, "Bucket is dry");
+          await expectThrow(bucket.mint(account, available, sig(account)));
+        })
+      );
+    });
+
+    it("allow minter to mint", async () => {
+      await bucket.mint(first, 1, sig(minter));
+    });
+  });
+
+  describe("Minting", () => {
+    before(async () => {
+      // remove side effects
+      // 5k tokens per second
+      rate = 5000 * 10e8;
+      // 300k tokens per second (1 minute to fullfil)
+      size = 300000 * 10e8;
+      token = await MustToken.new();
+      bucket = await TokenBucket.new(token.address, size, rate);
+      await token.addMinter(bucket.address);
+      await bucket.addMinter(minter);
+    });
+
+    it("should fire Mint in token", async () => {
+      const tx = await bucket.mint(first, 1000, sig(minter));
+
+      var abis = MustToken.abi;
+
+      const knownEvents = abis.reduce((acc, abi) => {
+        if (abi.type == "event") {
+          var signature =
+            abi.name + "(" + _.map(abi.inputs, "type").join(",") + ")";
+          acc[web3.sha3(signature)] = {
+            signature: signature,
+            abi_entry: abi
+          };
+        }
+        return acc;
+      }, {});
+
+      const parsedLogs = tx.receipt.logs.map(rawLog => {
+        const event = knownEvents[rawLog.topics[0]];
+
+        if (typeof event === "undefined") {
+          return null;
+        }
+
+        const types = event.abi_entry.inputs
+          .map(function(input) {
+            return input.indexed == true ? null : input.type;
+          })
+          .filter(function(type) {
+            return type != null;
+          });
+
+        const values = SolidityCoder.decodeParams(
+          types,
+          rawLog.data.replace("0x", "")
+        );
+
+        let index = 0;
+
+        return {
+          event: event.abi_entry.name,
+          args: event.abi_entry.inputs.reduce((acc, input) => {
+            acc[input.name] = input.indexed ? "indexed" : values[index++];
+            return acc;
+          }, {})
+        };
+      });
+
+      const mintEvents = parsedLogs.filter(log => log.event === "Mint");
+      assert.isBelow(0, mintEvents.length, "Mint event not found");
+      assert.equal(1000, mintEvents[0].args.amount, "Mint value isn't same");
+    });
+
+    it("should increase total supply", async () => {
+      const totalBefore = await token.totalSupply();
+      await bucket.mint(first, 1000, sig(minter));
+      const totalAfter = await token.totalSupply();
+
+      assert.equal(
+        1000,
+        totalAfter.sub(totalBefore),
+        "Total isn't same as minter amount"
+      );
+    });
+
+    it("should increase balance of beneficiar", async () => {
+      const balanceBefore = await token.balanceOf(first);
+      await bucket.mint(first, 1000, sig(minter));
+      const balanceAfter = await token.balanceOf(first);
+
+      assert.equal(
+        1000,
+        balanceAfter.sub(balanceBefore),
+        "Balance has increased on incorrect amount"
+      );
     });
   });
 });
