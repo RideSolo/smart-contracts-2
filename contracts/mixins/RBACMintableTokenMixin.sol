@@ -6,7 +6,7 @@ import "zeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
 contract RBACMintableTokenMixin is MintableToken, RBACMixin {
   // @dev override the Mintable token modifier to add role based logic
   modifier hasMintPermission() {
-    hasRoles(msg.sender, MINTER_ROLE);
+    require(isMinter(msg.sender));
     _;
   }
 }

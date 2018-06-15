@@ -10,28 +10,72 @@ contract RBACMixin {
   uint8 constant public ADMIN_ROLE    = 1 << 0;
   uint8 constant public MINTER_ROLE   = 1 << 1;
 
-  /// @dev uint8 could collect up to 8 roles
-  mapping (address => uint8) public roles;
+  mapping (address => bool) public owners;
+  mapping (address => bool) public minters;
 
-  event SetRole(address indexed _who, uint8 indexed _roles);
+  event AddOwner(address indexed _who);
+  event RemoveOwner(address indexed _who);
+
+  event AddMinter(address indexed _who);
+  event RemoveMinter(address indexed _who);
 
   constructor () public {
-    roles[msg.sender] = ALL_ROLES;
-    updateRole(msg.sender, ALL_ROLES);
+    _setOwner(msg.sender, true);
   }
 
-  modifier needRole(address _who, uint8 _role) {
-    require(hasRoles(_who, _role), FORBIDDEN);
+  modifier senderIsOwner() {
+    require(isOwner(msg.sender), FORBIDDEN);
     _;
   }
 
-  function updateRole(address _who, uint8 _roles) public needRole(msg.sender, ADMIN_ROLE) returns(bool) {
-    roles[_who] = _roles;
-    emit SetRole(_who, _roles);
+  modifier senderIsMinter() {
+    require(isMinter(msg.sender), FORBIDDEN);
+    _;
+  }
+
+  function isOwner(address _who) public view returns (bool) {
+    return owners[_who];
+  }
+
+  function isMinter(address _who) public view returns (bool) {
+    return minters[_who] || owners[_who];
+  }
+
+  function addOwner(address _who) public senderIsOwner returns (bool) {
+    _setOwner(_who, true);
+  }
+
+  function removeOwner(address _who) public senderIsOwner returns (bool) {
+    _setOwner(_who, false);
+  }
+
+  function addMinter(address _who) public senderIsOwner returns (bool) {
+    _setMinter(_who, true);
+  }
+
+  function removeMinter(address _who) public senderIsOwner returns (bool) {
+    _setMinter(_who, false);
+  }
+
+  function _setOwner(address _who, bool _flag) private returns (bool) {
+    require(owners[_who] != _flag);
+    owners[_who] = _flag;
+    if (_flag) {
+      emit AddOwner(_who);
+    } else {
+      emit RemoveOwner(_who);
+    }
     return true;
   }
 
-  function hasRoles(address _who, uint8 _role) public view returns(bool) {
-    return roles[_who] & _role == _role;
+  function _setMinter(address _who, bool _flag) private returns (bool) {
+    require(minters[_who] != _flag);
+    minters[_who] = _flag;
+    if (_flag) {
+      emit AddMinter(_who);
+    } else {
+      emit RemoveMinter(_who);
+    }
+    return true;
   }
 }
