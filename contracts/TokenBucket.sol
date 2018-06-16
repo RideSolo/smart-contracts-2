@@ -47,7 +47,7 @@ contract TokenBucket is RBACMixin {
 
   function availableForMint() public view returns (uint) {
      // solium-disable-next-line security/no-block-members
-    uint timeAfterMint = now - lastMintTime;
+    uint timeAfterMint = now.sub(lastMintTime);
     uint availableRate = rate.mul(timeAfterMint).add(leftOnLastMint);
     return size < availableRate ? size : availableRate;
   }
