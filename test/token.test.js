@@ -28,9 +28,8 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
         await token.name()
       );
     });
-    it("Should have symbol/ticker named as MUST", async () => {
+    it("Should have symbol named as MUST", async () => {
       assert.equal("MUST", await token.symbol());
-      assert.equal("MUST", await token.ticker());
     });
   });
   describe("Minting", () => {
@@ -63,7 +62,7 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
     });
     it("should reject minting over hardcap", async () => {
       const currentTotal = await token.totalSupply();
-      const hardcap = await token.hardcap();
+      const hardcap = await token.cap();
       const leftTotal = hardcap.sub(currentTotal);
       await token.mint(buyer, leftTotal, sig(minter));
       await expectThrow(token.mint(buyer, 1, sig(minter)));

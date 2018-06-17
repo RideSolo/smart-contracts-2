@@ -12,7 +12,7 @@ contract ERC223TokenBurnerMock {
     receiver = ERC223ReceiverMixin(_receiver);
   }
 
-  function triggerFallback(address _from, uint _value, bytes _data) public {
+  function triggerFallback(address _from, uint256 _value, bytes _data) public {
     emit BurnMock(_value);
     receiver.tokenFallback(_from, _value, _data); 
   }

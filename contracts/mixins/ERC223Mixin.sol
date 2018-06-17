@@ -44,7 +44,7 @@ contract ERC223Mixin is StandardToken {
     }
   }
 
-  function transfer(address _to, uint _value, bytes _data) public returns (bool success) {
+  function transfer(address _to, uint256 _value, bytes _data) public returns (bool success) {
     if (isContract(_to)) {
       return transferToContract(
         msg.sender,
@@ -60,13 +60,13 @@ contract ERC223Mixin is StandardToken {
     }
   }
 
-  function transfer(address _to, uint _value) public returns (bool success) {
+  function transfer(address _to, uint256 _value) public returns (bool success) {
     bytes memory empty;
     return transfer(_to, _value, empty);
   }
 
   function isContract(address _addr) internal view returns (bool) {
-    uint length;
+    uint256 length;
     // solium-disable-next-line security/no-inline-assembly
     assembly {
       //retrieve the size of the code on target address, this needs assembly
@@ -75,7 +75,7 @@ contract ERC223Mixin is StandardToken {
     return (length>0);
   }
 
-  function moveTokens(address _from, address _to, uint _value) internal returns (bool success) {
+  function moveTokens(address _from, address _to, uint256 _value) internal returns (bool success) {
     if (balanceOf(_from) < _value) {
       revert();
     }
@@ -88,7 +88,7 @@ contract ERC223Mixin is StandardToken {
   function transferToAddress(
     address _from,
     address _to,
-    uint _value,
+    uint256 _value,
     bytes _data
   ) internal returns (bool success) 
   {
@@ -102,7 +102,7 @@ contract ERC223Mixin is StandardToken {
   function transferToContract(
     address _from,
     address _to,
-    uint _value,
+    uint256 _value,
     bytes _data
   ) internal returns (bool success) 
   {

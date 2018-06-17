@@ -9,35 +9,35 @@ interface IMintableToken {
 
 contract TokenBucket is RBACMixin {
   using SafeMath for uint;
-  uint public size;
-  uint public rate;
-  uint public lastMintTime;
-  uint public leftOnLastMint;
+  uint256 public size;
+  uint256 public rate;
+  uint256 public lastMintTime;
+  uint256 public leftOnLastMint;
 
   IMintableToken public token;
 
-  event Leak(address indexed beneficiar, uint left);
+  event Leak(address indexed beneficiar, uint256 left);
 
-  constructor (address _token, uint _size, uint _rate) public {
+  constructor (address _token, uint256 _size, uint256 _rate) public {
     token = IMintableToken(_token);
     size = _size;
     rate = _rate;
   }
 
-  function setSize(uint _size) public senderIsOwner returns (bool) {
+  function setSize(uint256 _size) public senderIsOwner returns (bool) {
     size = _size;
   }
 
-  function setRate(uint _rate) public senderIsOwner returns (bool) {
+  function setRate(uint256 _rate) public senderIsOwner returns (bool) {
     rate = _rate;
   }
 
-  function setSizeAndRate(uint _size, uint _rate) public senderIsOwner returns (bool) {
+  function setSizeAndRate(uint256 _size, uint256 _rate) public senderIsOwner returns (bool) {
     return setSize(_size) && setRate(_rate);
   }
 
-  function mint(address _beneficiar, uint _amount) public senderIsMinter returns (bool) {
-    uint available = availableForMint();
+  function mint(address _beneficiar, uint256 _amount) public senderIsMinter returns (bool) {
+    uint256 available = availableRate();
     require(_amount <= available);
     leftOnLastMint = available.sub(_amount);
     lastMintTime = now; // solium-disable-line security/no-block-members
@@ -45,10 +45,10 @@ contract TokenBucket is RBACMixin {
     return true;
   }
 
-  function availableForMint() public view returns (uint) {
+  function availableRate() public view returns (uint) {
      // solium-disable-next-line security/no-block-members
-    uint timeAfterMint = now.sub(lastMintTime);
-    uint availableRate = rate.mul(timeAfterMint).add(leftOnLastMint);
+    uint256 timeAfterMint = now.sub(lastMintTime);
+    uint256 availableRate = rate.mul(timeAfterMint).add(leftOnLastMint);
     return size < availableRate ? size : availableRate;
   }
 }

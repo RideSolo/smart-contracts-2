@@ -24,27 +24,27 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
     it("should have full size at start", async () => {
       assert.equal(
         size.toString(),
-        (await bucket.availableForMint()).toString(10)
+        (await bucket.availableRate()).toString(10)
       );
     });
 
     it("should decrease available after mint", async () => {
       await bucket.mint(first, 1000000);
-      const available = await bucket.availableForMint();
+      const available = await bucket.availableRate();
       assert.isAbove(size, available.toNumber());
     });
 
     it("should return available after time", async () => {
-      const availableAtBegin = await bucket.availableForMint();
+      const availableAtBegin = await bucket.availableRate();
       await bucket.mint(second, availableAtBegin);
-      const availableAfterMint = await bucket.availableForMint();
+      const availableAfterMint = await bucket.availableRate();
       assert.equal(
         0,
         availableAfterMint,
         "Available amount to mint isn't zero after mint"
       );
       await increaseTime(duration.hours(1));
-      const availableAfterTime = await bucket.availableForMint();
+      const availableAfterTime = await bucket.availableRate();
       assert.equal(
         size,
         availableAfterTime,
@@ -83,7 +83,7 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
     it("reject minting from strangers", async () => {
       await Promise.all(
         [first, second].map(async account => {
-          const available = await bucket.availableForMint();
+          const available = await bucket.availableRate();
           assert.isBelow(0, available, "Bucket is dry");
           await expectThrow(bucket.mint(account, available, sig(account)));
         })

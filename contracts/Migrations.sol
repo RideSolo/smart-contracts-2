@@ -3,7 +3,7 @@ pragma solidity ^0.4.23;
 
 contract Migrations {
   address public owner;
-  uint public last_completed_migration; // solium-disable-line mixedcase
+  uint256 public last_completed_migration; // solium-disable-line mixedcase
 
   constructor() public {
     owner = msg.sender;
@@ -15,7 +15,7 @@ contract Migrations {
     }
   }
 
-  function setCompleted(uint completed) public restricted {
+  function setCompleted(uint256 completed) public restricted {
     last_completed_migration = completed;
   }
 

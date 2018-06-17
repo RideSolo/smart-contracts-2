@@ -30,11 +30,11 @@ contract RBACERC223TokenFinalization is ERC223Mixin, RBACMixin {
     return super.transferFrom(_from, _to, _value, _data); // solium-disable-line arg-overflow
   }
 
-  function transfer(address _to, uint _value, bytes _data) public isSane returns (bool) {
+  function transfer(address _to, uint256 _value, bytes _data) public isSane returns (bool) {
     return super.transfer(_to, _value, _data);
   }
 
-  function transfer(address _to, uint _value) public isSane returns (bool) {
+  function transfer(address _to, uint256 _value) public isSane returns (bool) {
     return super.transfer(_to, _value);
   }
 
@@ -42,11 +42,11 @@ contract RBACERC223TokenFinalization is ERC223Mixin, RBACMixin {
     return super.approve(_spender, _value);
   }
 
-  function increaseApproval(address _spender, uint _addedValue) public isSane returns (bool) {
+  function increaseApproval(address _spender, uint256 _addedValue) public isSane returns (bool) {
     return super.increaseApproval(_spender, _addedValue);
   }
 
-  function decreaseApproval(address _spender, uint _subtractedValue) public isSane returns (bool) {
+  function decreaseApproval(address _spender, uint256 _subtractedValue) public isSane returns (bool) {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
 }
