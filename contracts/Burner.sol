@@ -36,7 +36,6 @@ contract Burner is ERC223ReceiverMixin {
   ];
 
   function tokenFallback(address _from, uint _value, bytes _data) public {
-    _data; // unused param
     // solium-disable-next-line security/no-block-members
     require(now >= DATE_01_JUNE_2018); 
     uint8 i = 0;
@@ -44,9 +43,8 @@ contract Burner is ERC223ReceiverMixin {
     while (i < dates.length && dates[i] < now) { 
       i++;
     }
-    require(i < dates.length);
-    uint8 discount = discounts[i];
+    assert(i < dates.length);
     require(ERC223TokenBurner(msg.sender).burn(_value));
-    emit Burn(_from, _value, discount);
+    emit Burn(_from, _value, discounts[i]);
   }
 }
