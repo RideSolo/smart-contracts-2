@@ -5,21 +5,12 @@ const ERC223ReceiverMock = artifacts.require("ERC223ReceiverMock.sol");
 
 contract("Token contract", ([owner, minter, buyer, another]) => {
   let token;
-  let STRANGER_ROLE;
-  let ALL_ROLES;
-  let ADMIN_ROLE;
-  let MINTER_ROLE;
   before(async () => {
     token = await MustToken.new();
     let receipt = await web3.eth.getTransactionReceipt(token.transactionHash);
     if (!process.env.SOLIDITY_COVERAGE) {
       assert.isBelow(receipt.gasUsed, 4700000);
     }
-
-    STRANGER_ROLE = (await token.STRANGER_ROLE()).toNumber();
-    ALL_ROLES = (await token.ALL_ROLES()).toNumber();
-    ADMIN_ROLE = (await token.ADMIN_ROLE()).toNumber();
-    MINTER_ROLE = (await token.MINTER_ROLE()).toNumber();
   });
   describe("Constants", () => {
     it("Should be named as Main Universal Standard of Tokenization", async () => {
@@ -80,14 +71,14 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
     before(async () => {
       await token.mint(buyer, 100000000, sig(minter));
     });
-    it("should reject transfer before sane", async () => {
+    it("should reject transfer before finali", async () => {
       await expectThrow(token.transfer(another, 50000, sig(buyer)));
     });
-    it("should reject sanetization from stranger and minter", async () => {
+    it("should reject finalization from stranger and minter", async () => {
       await Promise.all(
         [buyer, minter].map(async account => {
           assert.isFalse(await token.isOwner(account));
-          await expectThrow(token.saneIt(sig(account)));
+          await expectThrow(token.finalize(sig(account)));
           await expectThrow(token.transfer(another, 50000, sig(account)));
           await expectThrow(token.approve(another, 50000, sig(account)));
           await expectThrow(
@@ -119,17 +110,20 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
         })
       );
     });
-    it("should allow owner sane token", async () => {
-      await token.saneIt(sig(owner));
-      assert.isTrue(await token.sane(), "Token isn't sane after sane action");
-    });
-    it("should finish minting in sane", async () => {
+    it("should allow owner finalize token", async () => {
+      await token.finalize(sig(owner));
       assert.isTrue(
-        await token.mintingFinished(),
-        "Minting isn't finish after sane action"
+        await token.finalized(),
+        "Token isn't finali after finali action"
       );
     });
-    it("should allow to transfer tokens after sane", async () => {
+    it("should finish minting in finali", async () => {
+      assert.isTrue(
+        await token.mintingFinished(),
+        "Minting isn't finish after finali action"
+      );
+    });
+    it("should allow to transfer tokens after finali", async () => {
       await token.transfer(another, 5000, sig(buyer));
       await token.approve(another, 50000, sig(buyer));
       await token.increaseApproval(another, 1000, sig(buyer));
@@ -149,7 +143,7 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
         sig(another)
       );
     });
-    it("prevent minting after sane", async () => {
+    it("prevent minting after finali", async () => {
       await expectThrow(token.mint(buyer, 10000, sig(minter)));
     });
   });

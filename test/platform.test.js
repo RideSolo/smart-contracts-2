@@ -18,13 +18,13 @@ contract("Platform", ([owner, minter, buyer, agent]) => {
     });
 
     it("should mint tokens to buyer", async () => {
-      const available = await bucket.availableRate();
+      const available = await bucket.availableTokens();
       await bucket.mint(buyer, available, sig(minter));
       assert.equal(available.toNumber(), await token.balanceOf(buyer));
     });
 
     it("should finalize contracts", async () => {
-      await token.saneIt(sig(owner));
+      await token.finalize(sig(owner));
     });
 
     it("should transfer to agent", async () => {

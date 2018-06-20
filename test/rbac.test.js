@@ -48,15 +48,15 @@ contract("RBAC Mixin", ([owner, stranger, another]) => {
       assert.isTrue(await rbac.isOwner(another));
     });
 
-    it("new admin should have rights to remove previous", async () => {
-      await rbac.removeOwner(owner, sig(another));
+    it("new admin should have rights to delete previous", async () => {
+      await rbac.deleteOwner(owner, sig(another));
       assert.isFalse(await rbac.isOwner(owner), "Owner still has some roles");
     });
 
-    it("admin should have right to remove minter", async () => {
+    it("admin should have right to delete minter", async () => {
       assert.isTrue(await rbac.isOwner(another));
       assert.isTrue(await rbac.isMinter(stranger));
-      await rbac.removeMinter(stranger, sig(another));
+      await rbac.deleteMinter(stranger, sig(another));
     });
   });
 });

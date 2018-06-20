@@ -2,7 +2,8 @@ pragma solidity ^0.4.24;
 import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 import "./ERC223ReceiverMixin.sol";
 
-
+/// @title Custom implementation of ERC223 
+/// @author Aler Denisov <aler.zampillo@gmail.com>
 contract ERC223Mixin is StandardToken {
   event Transfer(address indexed from, address indexed to, uint256 value, bytes data);
 
