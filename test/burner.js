@@ -8,8 +8,8 @@ contract("Burner", function ([owner, stranger, another]) {
   let blockNumber = 0;
 
   before(async () => {
-    burner = await Burner.new(sig(owner));
     token = await ERC223TokenBurnerMock.new(sig(owner));
+    burner = await Burner.new(token.address);
     await token.setReceiver(burner.address);
   });
 

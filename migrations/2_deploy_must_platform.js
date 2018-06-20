@@ -9,9 +9,9 @@ module.exports = async function(deployer, network, [owner, minter]) {
     const size = 300000 * 10e8;
     await deployer.deploy(MustToken);
     await deployer.deploy(TokenBucket, MustToken.address, size, rate);
-    await deployer.deploy(Burner);
 
     const token = await MustToken.deployed();
+    await deployer.deploy(Burner, token.address);
     const bucket = await TokenBucket.deployed();
 
     token.addMinter(bucket.address);
