@@ -8,12 +8,8 @@
   },
   "scripts": {
     "test": "scripts/test.sh",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "lint:sol": "solium -d .",
-    "lint:sol:fix": "solium -d . --fix",
-    "lint:all": "npm run lint && npm run lint:sol",
-    "lint:all:fix": "npm run lint:fix && npm run lint:sol:fix",
+    "lint": "solium -d .",
+    "lint:fix": "solium -d . --fix",
     "console": "truffle console",
     "coverage": "scripts/coverage.sh"
   },
@@ -22,9 +18,7 @@
     "url": "git+https://github.com/MUSTplatform/smart-contracts.git"
   },
   "author": "",
-  "contributors": [
-    "Aler Denisov <aler.zampillo@gmail.com>"
-  ],
+  "contributors": ["Aler Denisov <aler.zampillo@gmail.com>"],
   "bugs": {
     "url": "https://github.com/MUSTplatform/smart-contracts/issues"
   },
