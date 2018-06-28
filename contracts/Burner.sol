@@ -39,7 +39,6 @@ contract Burner is ERC223ReceiverMixin {
 
   function tokenFallback(address _from, uint256 _value, bytes) public {
     require(msg.sender == address(token));
-      
     // solium-disable-next-line security/no-block-members
     for (uint256 i = 0; i < phases.length; i++) {
       // solium-disable-next-line security/no-block-members
@@ -48,7 +47,7 @@ contract Burner is ERC223ReceiverMixin {
         emit Burn(_from, _value, phases[i].discount);
         break;
       }
-    }
+    } // solium-disable-line indentation
     assert(i < phases.length);
   }
 

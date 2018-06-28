@@ -4,6 +4,7 @@ import "./mixins/RBACMintableTokenMixin.sol";
 import "./mixins/RBACERC223TokenFinalization.sol";
 import "zeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
 
+
 /// @title MUST Platform token implementation
 /// @author Aler Denisov <aler.zampillo@gmail.com>
 /// @dev Implements ERC20, ERC223 and MintableToken interfaces as well as capped and finalization logic

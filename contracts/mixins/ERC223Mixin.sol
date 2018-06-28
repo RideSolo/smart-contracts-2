@@ -2,6 +2,7 @@ pragma solidity ^0.4.24;
 import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 import "./ERC223ReceiverMixin.sol";
 
+
 /// @title Custom implementation of ERC223 
 /// @author Aler Denisov <aler.zampillo@gmail.com>
 contract ERC223Mixin is StandardToken {
@@ -18,7 +19,7 @@ contract ERC223Mixin is StandardToken {
       _from, 
       _to, 
       _value, 
-      empty);
+      empty); // solium-disable-line indentation
   }
 
   function transferFrom(
@@ -35,13 +36,13 @@ contract ERC223Mixin is StandardToken {
         _from, 
         _to, 
         _value, 
-        _data);
+        _data);  // solium-disable-line indentation
     } else {
       return transferToAddress(
         _from, 
         _to, 
         _value, 
-        _data);
+        _data); // solium-disable-line indentation
     }
   }
 
@@ -51,13 +52,13 @@ contract ERC223Mixin is StandardToken {
         msg.sender,
         _to,
         _value,
-        _data);
+        _data); // solium-disable-line indentation
     } else {
       return transferToAddress(
         msg.sender,
         _to,
         _value,
-        _data);
+        _data); // solium-disable-line indentation
     }
   }
 
@@ -72,7 +73,7 @@ contract ERC223Mixin is StandardToken {
     assembly {
       //retrieve the size of the code on target address, this needs assembly
       length := extcodesize(_addr)
-    }
+    }  // solium-disable-line indentation
     return (length>0);
   }
 

@@ -1,5 +1,6 @@
 pragma solidity ^0.4.24;
 
+
 /// @title Role based access control mixin for MUST Platform
 /// @author Aler Denisov <aler.zampillo@gmail.com>
 /// @dev Ignore DRY approach to achieve readability

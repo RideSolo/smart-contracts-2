@@ -6,6 +6,7 @@ interface IMintableToken {
   function mint(address _to, uint256 _amount) external returns (bool);
 }
 
+
 /// @title Very simplified implementation of Token Bucket Algorithm to secure token minting
 /// @author Aler Denisov <aler.zampillo@gmail.com>
 /// @notice Works with tokens implemented Mintable interface
@@ -67,7 +68,6 @@ contract TokenBucket is RBACMixin, IMintableToken {
   function setSizeAndRate(uint256 _size, uint256 _rate) public onlyOwner returns (bool) {
     return setSize(_size) && setRate(_rate);
   }
-
 
   /// @notice Function to mint tokens
   /// @param _to The address that will receive the minted tokens.
