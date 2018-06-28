@@ -12,18 +12,18 @@ contract RBACMixin {
   mapping (address => bool) public minters;
 
   /// @notice The event indicates the addition of a new owner
-  /// @param _who is address of added owner
-  event AddOwner(address indexed _who);
+  /// @param who is address of added owner
+  event AddOwner(address indexed who);
   /// @notice The event indicates the deletion of an owner
-  /// @param _who is address of deleted owner
-  event DeleteOwner(address indexed _who);
+  /// @param who is address of deleted owner
+  event DeleteOwner(address indexed who);
 
   /// @notice The event indicates the addition of a new minter
-  /// @param _who is address of added minter
-  event AddMinter(address indexed _who);
+  /// @param who is address of added minter
+  event AddMinter(address indexed who);
   /// @notice The event indicates the deletion of a minter
-  /// @param _who is address of deleted minter
-  event DeleteMinter(address indexed _who);
+  /// @param who is address of deleted minter
+  event DeleteMinter(address indexed who);
 
   constructor () public {
     _setOwner(msg.sender, true);
@@ -52,7 +52,7 @@ contract RBACMixin {
   /// @param _who is address to look up
   /// @return A boolean of minter role
   function isMinter(address _who) public view returns (bool) {
-    return minters[_who] || owners[_who];
+    return minters[_who];
   }
 
   /// @notice Adds the owner role to provided address

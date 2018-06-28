@@ -37,8 +37,15 @@ contract MustToken is StandardBurnableToken, RBACERC223TokenFinalization, RBACMi
   /// @return A boolean that indicates if the operation was successful.
   function finalize() public returns (bool) {
     require(super.finalize());
-    mintingFinished = true;
-    emit MintFinished();
+    require(finishMinting());
+    return true;
+  }
+
+  /// @notice Overrides finishMinting function from RBACMintableTokenMixin to prevent finishing minting before finalization
+  /// @return A boolean that indicates if the operation was successful.
+  function finishMinting() public returns (bool) {
+    require(finalized == true);
+    require(super.finishMinting());
     return true;
   }
 }

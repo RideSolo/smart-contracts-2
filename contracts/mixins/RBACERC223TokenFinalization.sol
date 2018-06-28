@@ -6,6 +6,7 @@ import "./ERC223Mixin.sol";
 /// @title Role based token finalization mixin
 /// @author Aler Denisov <aler.zampillo@gmail.com>
 contract RBACERC223TokenFinalization is ERC223Mixin, RBACMixin {
+  event Finalize();
   /// @notice Public field inicates the finalization state of smart-contract
   bool public finalized;
 
@@ -26,6 +27,7 @@ contract RBACERC223TokenFinalization is ERC223Mixin, RBACMixin {
   /// @return A boolean that indicates if the operation was successful.
   function finalize() public notFinalized onlyOwner returns (bool) {
     finalized = true;
+    emit Finalize();
     return true;
   }
 

@@ -28,15 +28,24 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
       );
     });
 
+    it("should reject minting from non-minter", async () => {
+      await expectThrow(bucket.mint(owner, 10000 * 10e8, sig(owner)));
+    });
+
     it("should decrease available after mint", async () => {
-      await bucket.mint(first, 1000000);
+      await bucket.mint(first, 10000 * 10e8, sig(minter));
       const available = await bucket.availableTokens();
       assert.isAbove(size, available.toNumber());
     });
 
-    it("should return available after time", async () => {
+    it("should prevent to mint more than available", async () => {
+      const size = await bucket.availableTokens();
+      await expectThrow(bucket.mint(first, size.add(1), sig(minter)));
+    });
+
+    it("should refill bucket after time", async () => {
       const availableAtBegin = await bucket.availableTokens();
-      await bucket.mint(second, availableAtBegin);
+      await bucket.mint(second, availableAtBegin, sig(minter));
       const availableAfterMint = await bucket.availableTokens();
       assert.equal(
         0,

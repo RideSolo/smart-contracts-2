@@ -18,7 +18,9 @@
     "url": "git+https://github.com/MUSTplatform/smart-contracts.git"
   },
   "author": "",
-  "contributors": ["Aler Denisov <aler.zampillo@gmail.com>"],
+  "contributors": [
+    "Aler Denisov <aler.zampillo@gmail.com>"
+  ],
   "bugs": {
     "url": "https://github.com/MUSTplatform/smart-contracts/issues"
   },
@@ -34,6 +36,7 @@
     "babel-preset-stage-2": "6.24.1",
     "babel-preset-stage-3": "6.24.1",
     "babel-register": "6.26.0",
+    "chai": "^4.1.2",
     "coveralls": "3.0.1",
     "dotenv": "6.0.0",
     "ganache-cli": "6.1.3",
