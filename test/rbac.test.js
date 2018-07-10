@@ -81,6 +81,9 @@ contract("RBAC Mixin", ([owner, stranger, another, another2]) => {
       assert.isTrue(await rbac.isOwner(another));
       assert.isTrue(await rbac.isMinter(stranger));
       await rbac.deleteMinter(stranger, sig(another));
+
+      assert.isFalse(await rbac.isMinter(stranger));
+      await expectThrow(rbac.requireMinterRole(sig(stranger)));
     });
 
     it("should fire proper events", async () => {
