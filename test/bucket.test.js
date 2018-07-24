@@ -1,5 +1,6 @@
 import { sig } from "./utils";
 import assertRevert from "zeppelin-solidity/test/helpers/assertRevert";
+import latestTime from "zeppelin-solidity/test/helpers/latestTime";
 import increaseTime, {
   duration
 } from "zeppelin-solidity/test/helpers/increaseTime";
@@ -217,7 +218,7 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
   });
 
   describe("Changes effect", () => {
-    before(async () => {
+    beforeEach(async () => {
       rate = 5000 * 10e8;
       size = 300000 * 10e8;
       token = await MustToken.new();
@@ -232,6 +233,27 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
 
       await bucket.setSize(sizeBefore - 1000, sig(owner));
       assert.equal(await bucket.availableTokens(), availableBefore - 1000);
+    });
+
+    it("should prevent minting in case of lack tokens", async () => {
+      let available;
+      await bucket.setSize(2, sig(owner));
+      await bucket.setRate(0, sig(owner));
+
+      const time = await latestTime();
+      await bucket.mint(first, 1, sig(minter));
+      assert.equal(await bucket.availableTokens(), 1);
+      await bucket.mint(first, 1, sig(minter));
+      assert.equal(await bucket.availableTokens(), 0);
+
+      assert.equal(await bucket.availableTokens(), 0);
+      await assertRevert(bucket.mint(first, 1, sig(minter)));
+      // refill
+      await bucket.setRate(1, sig(owner));
+      await increaseTime(duration.seconds(1));
+      assert.equal(await bucket.availableTokens(), 1);
+      await bucket.mint(first, 1, sig(minter));
+      assert.equal(await bucket.availableTokens(), 0);
     });
   });
 });

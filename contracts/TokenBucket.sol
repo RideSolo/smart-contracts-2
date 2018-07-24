@@ -42,6 +42,7 @@ contract TokenBucket is RBACMixin, IMintableToken {
     token = IMintableToken(_token);
     size = _size;
     rate = _rate;
+    leftOnLastMint = _size;
   }
 
   /// @notice Change size of bucket
