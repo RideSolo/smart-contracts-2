@@ -1,5 +1,5 @@
 import { sig } from "./utils";
-import expectThrow from "zeppelin-solidity/test/helpers/expectThrow";
+import assertRevert from "zeppelin-solidity/test/helpers/assertRevert";
 import increaseTime, {
   duration
 } from "zeppelin-solidity/test/helpers/increaseTime";
@@ -29,7 +29,8 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
     });
 
     it("should reject minting from non-minter", async () => {
-      await expectThrow(bucket.mint(owner, 10000 * 10e8, sig(owner)));
+      await assertRevert(bucket.mint(owner, 10000 * 10e8, sig(owner)));
+      await assertRevert(bucket.mint(owner, 10000 * 10e8, sig(first)));
     });
 
     it("should decrease available after mint", async () => {
@@ -40,7 +41,7 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
 
     it("should prevent to mint more than available", async () => {
       const size = await bucket.availableTokens();
-      await expectThrow(bucket.mint(first, size.add(1), sig(minter)));
+      await assertRevert(bucket.mint(first, size.add(1), sig(minter)));
     });
 
     it("should refill bucket after time", async () => {
@@ -66,9 +67,9 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
     it("should reject changes from strangers", async () => {
       await Promise.all(
         [first, second].map(async account => {
-          await expectThrow(bucket.setSize(size + size, sig(account)));
-          await expectThrow(bucket.setRate(rate + rate, sig(account)));
-          await expectThrow(
+          await assertRevert(bucket.setSize(size + size, sig(account)));
+          await assertRevert(bucket.setRate(rate + rate, sig(account)));
+          await assertRevert(
             bucket.setSizeAndRate(size + size, rate + rate, sig(account))
           );
         })
@@ -76,17 +77,37 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
     });
 
     it("should reject changes from minter", async () => {
-      await expectThrow(bucket.setSize(size + size, sig(minter)));
-      await expectThrow(bucket.setRate(rate + rate, sig(minter)));
-      await expectThrow(
+      await assertRevert(bucket.setSize(size + size, sig(minter)));
+      await assertRevert(bucket.setRate(rate + rate, sig(minter)));
+      await assertRevert(
         bucket.setSizeAndRate(size + size, rate + rate, sig(minter))
       );
     });
 
     it("should allow owner to change settings", async () => {
-      await bucket.setRate(rate + rate, sig(owner));
-      await bucket.setSize(size + size, sig(owner));
+      const rateBefore = await bucket.rate();
+      const sizeBefore = await bucket.size();
+
+      await bucket.setRate(rateBefore + 1, sig(owner));
+      await bucket.setSize(sizeBefore + 1, sig(owner));
+
+      assert.equal(await bucket.size(), sizeBefore + 1);
+      assert.equal(await bucket.rate(), rateBefore + 1);
+
       await bucket.setSizeAndRate(size + size, rate + rate, sig(owner));
+
+      assert.equal(
+        await bucket.size(),
+        size + size,
+        `incorrect size: ${await bucket.size()} (expect: ${size +
+          size} = ${size} + ${size})`
+      );
+      assert.equal(
+        await bucket.rate(),
+        rate + rate,
+        `incorrect rate: ${await bucket.rate()} (expect: ${rate +
+          rate} = ${rate} + ${rate})`
+      );
     });
 
     it("reject minting from strangers", async () => {
@@ -94,7 +115,7 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
         [first, second].map(async account => {
           const available = await bucket.availableTokens();
           assert.isBelow(0, available, "Bucket is dry");
-          await expectThrow(bucket.mint(account, available, sig(account)));
+          await assertRevert(bucket.mint(account, available, sig(account)));
         })
       );
     });
@@ -192,6 +213,25 @@ contract("TokenBucket", ([owner, minter, first, second, third, fourth]) => {
         balanceAfter.sub(balanceBefore),
         "Balance has increased on incorrect amount"
       );
+    });
+  });
+
+  describe("Changes effect", () => {
+    before(async () => {
+      rate = 5000 * 10e8;
+      size = 300000 * 10e8;
+      token = await MustToken.new();
+      bucket = await TokenBucket.new(token.address, size, rate);
+      await token.addMinter(bucket.address);
+      await bucket.addMinter(minter);
+    });
+
+    it("size should decrease rate", async () => {
+      const availableBefore = await bucket.availableTokens();
+      const sizeBefore = await bucket.size();
+
+      await bucket.setSize(sizeBefore - 1000, sig(owner));
+      assert.equal(await bucket.availableTokens(), availableBefore - 1000);
     });
   });
 });

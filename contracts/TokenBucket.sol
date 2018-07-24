@@ -50,6 +50,7 @@ contract TokenBucket is RBACMixin, IMintableToken {
   /// @return A boolean that indicates if the operation was successful.
   function setSize(uint256 _size) public onlyOwner returns (bool) {
     size = _size;
+    return true;
   }
 
   /// @notice Change refill rate of bucket
@@ -58,6 +59,7 @@ contract TokenBucket is RBACMixin, IMintableToken {
   /// @return A boolean that indicates if the operation was successful.
   function setRate(uint256 _rate) public onlyOwner returns (bool) {
     rate = _rate;
+    return true;
   }
 
   /// @notice Change size and refill rate of bucket

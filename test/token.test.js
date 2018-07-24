@@ -1,5 +1,4 @@
 import { sig } from "./utils";
-import expectThrow from "zeppelin-solidity/test/helpers/expectThrow";
 import assertRevert from "zeppelin-solidity/test/helpers/assertRevert";
 const MustToken = artifacts.require("MustToken.sol");
 const ERC223ReceiverMock = artifacts.require("ERC223ReceiverMock.sol");
@@ -25,10 +24,6 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
     });
   });
   describe("Minting", () => {
-    before(async () => {
-      await token.addMinter(minter, sig(owner));
-    });
-
     it("minting shouldn't be finished after creation", async () => {
       assert.equal(await token.mintingFinished(), false);
     });
@@ -39,6 +34,14 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
         await token.totalSupply(),
         "Total supply isn't 0 at start"
       );
+    });
+
+    it("should reject minting from non-minters", async () => {
+      await assertRevert(token.mint(buyer, 1, sig(minter)));
+    });
+
+    it("should allow owner to add minters", async () => {
+      await token.addMinter(minter, sig(owner));
     });
 
     it("shoud allow minter to mint tokens", async () => {
@@ -75,7 +78,7 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
       const hardcap = await token.cap();
       const leftTotal = hardcap.sub(currentTotal);
       await token.mint(buyer, leftTotal, sig(minter));
-      await expectThrow(token.mint(buyer, 1, sig(minter)));
+      await assertRevert(token.mint(buyer, 1, sig(minter)));
     });
 
     it("should allow to burn tokens", async () => {
@@ -101,7 +104,7 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
     });
 
     it("should reject transfer before finalization", async () => {
-      await expectThrow(token.transfer(another, 50000, sig(buyer)));
+      await assertRevert(token.transfer(another, 50000, sig(buyer)));
     });
 
     it("should reject finishMinting outside finalization", async () => {});
@@ -110,10 +113,10 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
       await Promise.all(
         [buyer, minter].map(async account => {
           assert.isFalse(await token.isOwner(account));
-          await expectThrow(token.finalize(sig(account)));
-          await expectThrow(token.transfer(another, 50000, sig(account)));
-          await expectThrow(token.approve(another, 50000, sig(account)));
-          await expectThrow(
+          await assertRevert(token.finalize(sig(account)));
+          await assertRevert(token.transfer(another, 50000, sig(account)));
+          await assertRevert(token.approve(another, 50000, sig(account)));
+          await assertRevert(
             token.transfer(
               another,
               50000,
@@ -121,16 +124,16 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
               sig(account)
             )
           );
-          await expectThrow(
+          await assertRevert(
             token.increaseApproval(another, 1000, sig(account))
           );
-          await expectThrow(
+          await assertRevert(
             token.decreaseApproval(another, 1000, sig(account))
           );
-          await expectThrow(
+          await assertRevert(
             token.transferFrom(account, another, 25000, sig(another))
           );
-          await expectThrow(
+          await assertRevert(
             token.transferFrom(
               account,
               another,
@@ -202,9 +205,11 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
       const balance = await token.balanceOf(buyer);
       const more = balance.add(1);
 
-      await expectThrow(token.transfer(another, more, sig(buyer)));
+      await assertRevert(token.transfer(another, more, sig(buyer)));
       await token.approve(another, more, sig(buyer));
-      await expectThrow(token.transferFrom(buyer, another, more, sig(another)));
+      await assertRevert(
+        token.transferFrom(buyer, another, more, sig(another))
+      );
     });
 
     it("fallback test with approval", async () => {
