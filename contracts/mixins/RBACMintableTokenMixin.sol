@@ -40,7 +40,7 @@ contract RBACMintableTokenMixin is StandardToken, RBACMixin {
    * @dev Function to stop minting new tokens.
    * @return True if the operation was successful.
    */
-  function finishMinting() onlyOwner canMint public returns (bool) {
+  function finishMinting() onlyOwner canMint internal returns (bool) {
     mintingFinished = true;
     emit MintFinished();
     return true;
