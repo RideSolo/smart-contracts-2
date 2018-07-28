@@ -17,9 +17,9 @@ contract ERC223Mixin is StandardToken {
     bytes memory empty;
     return transferFrom(
       _from, 
-      _to, 
-      _value, 
-      empty); // solium-disable-line indentation
+      _to,
+      _value,
+      empty);
   }
 
   function transferFrom(
@@ -36,7 +36,7 @@ contract ERC223Mixin is StandardToken {
         _from, 
         _to, 
         _value, 
-        _data);  // solium-disable-line indentation
+        _data);
     } else {
       return transferToAddress(
         _from, 
