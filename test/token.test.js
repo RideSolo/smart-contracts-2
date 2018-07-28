@@ -107,8 +107,6 @@ contract("Token contract", ([owner, minter, buyer, another]) => {
       await assertRevert(token.transfer(another, 50000, sig(buyer)));
     });
 
-    it("should reject finishMinting outside finalization", async () => {});
-
     it("should reject finalization from stranger and minter", async () => {
       await Promise.all(
         [buyer, minter].map(async account => {

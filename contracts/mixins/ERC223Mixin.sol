@@ -42,7 +42,7 @@ contract ERC223Mixin is StandardToken {
         _from, 
         _to, 
         _value, 
-        _data); // solium-disable-line indentation
+        _data); 
     }
   }
 
@@ -52,13 +52,13 @@ contract ERC223Mixin is StandardToken {
         msg.sender,
         _to,
         _value,
-        _data); // solium-disable-line indentation
+        _data); 
     } else {
       return transferToAddress(
         msg.sender,
         _to,
         _value,
-        _data); // solium-disable-line indentation
+        _data);
     }
   }
 
@@ -73,7 +73,7 @@ contract ERC223Mixin is StandardToken {
     assembly {
       //retrieve the size of the code on target address, this needs assembly
       length := extcodesize(_addr)
-    }  // solium-disable-line indentation
+    }  
     return (length>0);
   }
 
