@@ -46,8 +46,8 @@ contract Burner is ERC223ReceiverMixin {
         emit Burn(_from, _value, phases[i].discount);
         return;
       }
-    } 
-   revert();
+    }
+    revert();
   }
 
 }
