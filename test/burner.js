@@ -1,4 +1,5 @@
 import { sig } from "./utils";
+import assertRevert from "zeppelin-solidity/test/helpers/assertRevert";
 import { timeTravelTo } from "./utils";
 const Burner = artifacts.require("Burner.sol");
 const ERC223TokenBurnerMock = artifacts.require("ERC223TokenBurnerMock.sol");
@@ -33,6 +34,7 @@ contract("Burner", function ([owner, stranger, another]) {
     blockNumber = web3.eth.blockNumber + 1;
   }
 
+  
   it("in October 2018 discount should be 50", async () => {
       await verifyDiscount("2018-10-07", 50);
   });
@@ -52,5 +54,11 @@ contract("Burner", function ([owner, stranger, another]) {
   it("in Decemember 2022 discount should be 95", async () => {
       await verifyDiscount("2022-08-07", 95);
   });
+
+  it("in July 2023 should fail", async () => {
+      await timeTravelTo("2023-07-07");
+      await assertRevert(token.triggerFallback(stranger, 42, 0));
+  });
+
 
 });
